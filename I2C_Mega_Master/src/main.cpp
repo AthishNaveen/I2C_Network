@@ -1,26 +1,23 @@
 #include <Wire.h>
 #include <Arduino.h>
 
-// Include the required Wire library for I2C<br>#include 
-int x = 0;
 void setup() {
   // Start the I2C Bus as Master
   Wire.begin(); 
   Serial.begin(9600);
 }
+
+
+int RxByte = 0;
 void loop() {
-  Wire.beginTransmission(9); // transmit t5o device #9
-  Wire.write(x);              // sends x 
-  Wire.endTransmission();    // stop transmitting
 
+Wire.requestFrom(0x55, 1);
+  while(Wire.available()) {  // Read Received Datat From Slave Device
+    RxByte = Wire.read();
+  }
 
-
-  x++; // Increment x
-  if (x > 5) x = 0; // `reset x once it gets 6
-
-
-Serial.print("send message:");
-Serial.println(x);
-
+  Serial.print("Received Data from slave= ");
+  Serial.println(RxByte);
+  
   delay(500);
 }
