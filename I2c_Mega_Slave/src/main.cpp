@@ -1,28 +1,38 @@
 #include <Wire.h>
 #include <Arduino.h>
 
-int num = 99;
-// Include the required Wire library for I2C<br>#include <Wire.h>
-int LED = 13;
-int x = 0;
-
-void sendEvent(){
- Serial.println("request raised");
-  Wire.write(num);
-}
-
 void setup() {
-  // Define the LED pin as Output
-  pinMode (LED, OUTPUT);
-  // Start the I2C Bus as Slave on address 9
-  Wire.begin(0x55); 
-
-   Wire.onRequest(sendEvent);
+  Wire.begin(0x44);
   Serial.begin(9600);
 }
+ 
+String receivedString = "";
 
+int RxByte = 0;
 void loop() {
-  delay(1000);
-  num = num + 1;
+    if (Serial.available()) {
+        char receivedChar = Serial.read();
+        receivedString = "";
 
+        // Keep reading until we reach a newline character
+        while (receivedChar != '\n') {
+            receivedString += receivedChar;
+            if (Serial.available()) {
+                receivedChar = Serial.read();
+            } else {
+                break;
+            }
+        }
+            // Print the received string
+    Serial.print("Received string: ");
+    Serial.println(receivedString);
+    }
+
+    delay(500);
+    Wire.beginTransmission(0x55);
+    Wire.write(receivedString.c_str(), receivedString.length());
+    Serial.println("Sent data to slave");
+    Wire.endTransmission();
+
+  delay(500);
 }
